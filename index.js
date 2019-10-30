@@ -8,6 +8,8 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 
 var usersRouter = require('./routers/users-router')
+var gamesRouter = require('./routers/games-router')
+var gameSessionsRouter = require('./routers/gameSession-router')
 
 var formidable = require('express-form-data')
 
@@ -23,8 +25,10 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
 app.use(formidable.parse({keepExtensions:true}))
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use("/users",usersRouter)
+app.use("/users", usersRouter)
+app.use("/games", gamesRouter)
+app.use('/gameSessions', gameSessionsRouter)
 
 app.listen('3333', function () {
-    console.log('Server successfully running at 3333 port',);
+  console.log('Server successfully running at 3333 port',);
 })

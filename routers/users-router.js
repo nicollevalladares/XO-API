@@ -30,13 +30,13 @@ router.get('/', (req,res) => {
 })
 
 // get a user information (GET method)
-router.get('/:id', validateUser, (req, res) => {
+router.get('/:id', (req, res) => {
     var usersReference = admin.database().ref('users')
 
     try {
         usersReference.orderByKey().equalTo(req.params.id)
         .on('child_added', (snapshotUser) => {
-            res.status(200).json({data: snapshotUser.val()})
+            res.status(200).json({user: snapshotUser.val()})
         },
         (err) => {
             res.status(400).send(err.code)
@@ -70,26 +70,4 @@ router.post('/', (req, res) => {
     }
 })
 
-//validate user logged with token.
-function validateUser(req, res, next) {
-    var idToken = req.headers.idToken
-
-    try {
-        if (idToken){
-            admin.auth().verifyIdToken(idToken)
-            .then((decodedIdToken) => {
-                if(decodedIdToken){
-                    req.uid = decodedIdToken.uid
-                    return next()
-                }
-            })
-        }
-        else{
-            res.status(401).json({code:401 ,message:"Access Unauthorized"})
-        }
-    } catch (error) {
-        res.status(400).send({message:'Error' + error})
-    }
-}
-
-module.exports = router
+module.exports = router;
