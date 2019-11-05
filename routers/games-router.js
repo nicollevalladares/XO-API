@@ -89,4 +89,24 @@ router.put('/edit/:id',  (req, res) => {
     }
 });
 
+//Edit game
+router.put('/winners/:id',  (req, res) => {
+    var gamesReference = admin.database().ref('games')
+    var winners = req.body.winners
+
+    try {
+        gamesReference.child(req.params.id + "/winners").set(winners, (err) => {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send("game changed");
+            }
+        });
+    } 
+    catch (error) {
+        res.send({status : 0, message:'Error: '+ error});
+    }
+});
+
 module.exports = router;

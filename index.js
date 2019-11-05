@@ -6,6 +6,10 @@ var bodyParser = require("body-parser")
 var serviceAccount = require("./serviceAccountKey.json")
 const path = require('path')
 const cookieParser = require('cookie-parser')
+const socketIO = require('socket.io')
+const http = require('http')
+var server = http.createServer(app);
+const io  = socketIO(server)
 
 var usersRouter = require('./routers/users-router')
 var gamesRouter = require('./routers/games-router')
@@ -29,6 +33,43 @@ app.use("/users", usersRouter)
 app.use("/games", gamesRouter)
 app.use('/gameSessions', gameSessionsRouter)
 
-app.listen('3333', function () {
+
+//socket section
+
+//start socket when a client is connected
+io.sockets.on('connect', socket =>{
+  var gameSessionsReference = admin.database().ref('gameSessions')
+  var gamesReference = admin.database().ref('games')
+
+  // this socket send a signal to each client when a session is updated.
+  gameSessionsReference.on("child_changed", function(snapshot) {
+    var session = snapshot.val();
+    
+    if(session.winner){
+      socket.emit('sessionUpdate', {idSession: snapshot.key, matrix: session.matrix, owner: session.owner, guest: session.guest, winner: session.winner, currentPlayer: session.currentPlayer})
+    }
+    else{
+      socket.emit('sessionUpdate', {idSession: snapshot.key, matrix: session.matrix, owner: session.owner, guest: session.guest})
+    }
+  })
+
+  // this socket send a signal to each client when a session is added.
+  gameSessionsReference.on("child_added", function(snapshot) {
+    var session = snapshot.val();
+    
+    socket.emit('sessionAdded', {idSession: snapshot.key})
+  })
+
+  // this socket send a signal to each client when a game is updated.
+  gamesReference.on("child_changed", function(snapshot) {
+    var game = snapshot.val();
+    
+    socket.emit('gameUpdate', {idGame: snapshot.key, guest: game.guest, winners: game.winners})
+  })
+})
+
+
+
+server.listen('3333', function () {
   console.log('Server successfully running at 3333 port',);
 })

@@ -54,7 +54,10 @@ router.post('/', (req, res) => {
     var data = {
         idGame: req.body.idGame,
         number: req.body.number,
-        matrix: req.body.matrix
+        matrix: req.body.matrix,
+        currentPlayer: req.body.currentPlayer,
+        owner: req.body.owner,
+        guest: req.body.guest
     }
 
     try {
@@ -72,23 +75,104 @@ router.post('/', (req, res) => {
 })
 
 //Edit game
-// router.put('/edit/:id',  (req, res) => {
-//     var gameSessionsReference = admin.database().ref('gameSessions')
-//     var guest = req.body.guest
+router.put('/edit/:id',  (req, res) => {
+    var gameSessionsReference = admin.database().ref('gameSessions')
+    var data = req.body.data
 
-//     try {
-//         gameSessionsReference.child(req.params.id + "/guest").set(guest, (err) => {
-//             if(err){
-//                 res.send(err);
-//             }
-//             else{
-//                 res.send("game changed");
-//             }
-//         });
-//     } 
-//     catch (error) {
-//         res.send({status : 0, message:'Error: '+ error})
-//     }
-// });
+    try {
+        gameSessionsReference.child(`${req.params.id}/matrix`).set(data, (err) => {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send("game changed");
+            }
+        });
+    } 
+    catch (error) {
+        res.send({status : 0, message:'Error: '+ error})
+    }
+});
+
+//Change currentPlayer
+router.put('/currentPlayer/:id',  (req, res) => {
+    var gameSessionsReference = admin.database().ref('gameSessions')
+    var currentPlayer = req.body.currentPlayer
+
+    try {
+        gameSessionsReference.child(`${req.params.id}/currentPlayer`).set(currentPlayer, (err) => {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send("game changed");
+            }
+        });
+    } 
+    catch (error) {
+        res.send({status : 0, message:'Error: '+ error})
+    }
+});
+
+//Update positions owner
+router.put('/owner/:id',  (req, res) => {
+    var gameSessionsReference = admin.database().ref('gameSessions')
+    var positions = req.body.positions
+
+    try {
+        gameSessionsReference.child(`${req.params.id}/owner`).set(positions, (err) => {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send("owner positions changed");
+            }
+        });
+    } 
+    catch (error) {
+        res.send({status : 0, message:'Error: '+ error})
+    }
+});
+
+//Update positions guest
+router.put('/guest/:id',  (req, res) => {
+    var gameSessionsReference = admin.database().ref('gameSessions')
+    var positions = req.body.positions
+
+    try {
+        gameSessionsReference.child(`${req.params.id}/guest`).set(positions, (err) => {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send("guest positions changed");
+            }
+        });
+    } 
+    catch (error) {
+        res.send({status : 0, message:'Error: '+ error})
+    }
+});
+
+
+//Save session winner
+router.put('/winner/:id',  (req, res) => {
+    var gameSessionsReference = admin.database().ref('gameSessions')
+    var winner = req.body.winner
+
+    try {
+        gameSessionsReference.child(`${req.params.id}/winner`).set(winner, (err) => {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send("game changed");
+            }
+        });
+    } 
+    catch (error) {
+        res.send({status : 0, message:'Error: '+ error})
+    }
+});
 
 module.exports = router;
